@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Atracciones de BLE</string>
+    <string name="helloWorldTag">Hola Mundo!</string>
 </resources>
