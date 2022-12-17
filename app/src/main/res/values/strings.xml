@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">BLE Attractions</string>
     <string name="helloWorldTag">Hello World!</string>
+    <string name="exploreButtonDefault">Explore Area</string>
+    <string name="ticketButtonDefault">Get/Check Tickets</string>
+    <string name="queueButtonDefault">Check Queue Times</string>
+    <string name="logoDescription">A Company Logo</string>
 </resources>
