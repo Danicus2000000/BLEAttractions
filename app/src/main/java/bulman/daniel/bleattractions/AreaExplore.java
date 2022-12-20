@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class AreaExplore extends AppCompatActivity {
 
@@ -78,8 +76,11 @@ public class AreaExplore extends AppCompatActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Discovery has found a device. Get the BluetoothDevice
                 // object and its info from the Intent.
-                mDeviceList.add(intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
-                updateDisplay();
+                BluetoothDevice device=intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if(!mDeviceList.contains(device)) {
+                    mDeviceList.add(device);
+                    updateDisplay();
+                }
             }
         }
     };
@@ -120,6 +121,13 @@ public class AreaExplore extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mReceiverIsRegistered) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_CONNECT_GRANTED);
+            }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_SCAN_GRANTED);
+            }
+            mBluetoothAdapter.cancelDiscovery();
             unregisterReceiver(receiver);
         }
     }
@@ -130,7 +138,7 @@ public class AreaExplore extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_CONNECT_GRANTED);
             }
-            toSet += "Name: " + mDeviceList.get(i).getName() + "MAC Address: " + mDeviceList.get(i).getAddress() + "\n";
+            toSet += "Name: " + mDeviceList.get(i).getName() + " MAC Address: " + mDeviceList.get(i).getAddress() + "\n";
         }
         contentDisplay.setText(toSet);
     }
