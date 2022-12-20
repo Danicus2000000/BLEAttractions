@@ -27,8 +27,8 @@ public class AreaExplore extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mReceiverIsRegistered;
     private static final int REQUEST_ENABLE_BT = 0;
-    private static final int REQUEST_PERMISSION_CONNECT_GRANTED=1;
-    private static final int REQUEST_PERMISSION_SCAN_GRANTED=2;
+    private static final int REQUEST_PERMISSION_MODERN = 1;
+    private static final int REQUEST_PERMISSION_CLASSIC = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,22 +50,11 @@ public class AreaExplore extends AppCompatActivity {
             Toast.makeText(this, "Bluetooth low energy is not supported on this device!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_CONNECT_GRANTED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_MODERN);
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_SCAN_GRANTED);
-        }
-        else{
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBT, REQUEST_ENABLE_BT);
-        } else {
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(receiver, filter);
-            mReceiverIsRegistered = true;
-            mBluetoothAdapter.startDiscovery();
-        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_CLASSIC);
         }
     }
 
@@ -87,12 +76,19 @@ public class AreaExplore extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        for(int i=0;i<permissions.length;i++)
-        {
-            if(grantResults[i]==-1)
-            {
-                Toast.makeText(getApplicationContext(),"permission: "+permissions[i]+" is required to discover using bluetooth!",Toast.LENGTH_SHORT).show();
-                finish();
+        if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)|| ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getApplicationContext(),"Permissions needed to continue!",Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else {
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBT, REQUEST_ENABLE_BT);
+            } else {
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                registerReceiver(receiver, filter);
+                mReceiverIsRegistered = true;
+                mBluetoothAdapter.startDiscovery();
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -106,7 +102,7 @@ public class AreaExplore extends AppCompatActivity {
                 registerReceiver(receiver, filter);
                 mReceiverIsRegistered = true;
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_SCAN_GRANTED);
+                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_MODERN);
                 }
                 mBluetoothAdapter.startDiscovery();
             } else {
@@ -122,10 +118,10 @@ public class AreaExplore extends AppCompatActivity {
         super.onDestroy();
         if (mReceiverIsRegistered) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_CONNECT_GRANTED);
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_MODERN);
             }
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_SCAN_GRANTED);
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_MODERN);
             }
             mBluetoothAdapter.cancelDiscovery();
             unregisterReceiver(receiver);
@@ -136,7 +132,7 @@ public class AreaExplore extends AppCompatActivity {
         String toSet = "";
         for (int i = 0; i < mDeviceList.size(); i++) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_CONNECT_GRANTED);
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_MODERN);
             }
             toSet += "Name: " + mDeviceList.get(i).getName() + " MAC Address: " + mDeviceList.get(i).getAddress() + "\n";
         }
