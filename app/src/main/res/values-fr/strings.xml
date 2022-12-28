@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">BLE Attractions</string>
     <string name="helloWorldTag">Bonjour le monde!</string>
+    <string name="logoDescription">Un logo d\'entreprise</string>
+    <string name="queueButtonDefault">Vérifier les temps d\'attente</string>
+    <string name="ticketButtonDefault">Obtenir/Vérifier les billets</string>
+    <string name="exploreButtonDefault">Explorer la zone</string>
 </resources>

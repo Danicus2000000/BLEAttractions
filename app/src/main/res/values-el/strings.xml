@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Αξιοθέατα BLE</string>
     <string name="helloWorldTag">Γειά σου Κόσμε!</string>
+    <string name="exploreButtonDefault">Εξερευνήστε την περιοχή</string>
+    <string name="ticketButtonDefault">Λήψη/Έλεγχος εισιτηρίων</string>
+    <string name="queueButtonDefault">Ελέγξτε τους χρόνους ουράς</string>
+    <string name="logoDescription">Λογότυπο εταιρείας</string>
 </resources>

@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">蓝牙景点</string>
     <string name="helloWorldTag">" 你好世界！"</string>
+    <string name="exploreButtonDefault">探索区</string>
+    <string name="ticketButtonDefault">获取/检查门票</string>
+    <string name="queueButtonDefault">检查排队时间</string>
+    <string name="logoDescription">公司标志</string>
 </resources>

@@ -15,7 +15,6 @@
         android:layout_marginTop="125dp"
         android:layout_marginEnd="1dp"
         android:layout_marginRight="1dp"
-        android:onClick="openExplore"
         android:text="@string/exploreButtonDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +28,6 @@
         android:layout_marginLeft="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginRight="1dp"
-        android:onClick="openTicketManager"
         android:text="@string/ticketButtonDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +41,6 @@
         android:layout_marginLeft="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginRight="1dp"
-        android:onClick="openQueueExplorer"
         android:text="@string/queueButtonDefault"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,11 +57,12 @@
         android:layout_marginRight="142dp"
         android:layout_marginBottom="125dp"
         android:contentDescription="@string/logoDescription"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toTopOf="@+id/exploreArea"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars"
-        tools:srcCompat="@tools:sample/avatars"
-        android:scaleType="fitXY"/>
+        tools:srcCompat="@tools:sample/avatars" />
 </androidx.constraintlayout.widget.ConstraintLayout>
