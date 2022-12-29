@@ -11,11 +11,25 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 public class AreaExplore extends AppCompatActivity {
@@ -23,14 +37,18 @@ public class AreaExplore extends AppCompatActivity {
     private TextView contentDisplay;
     private ArrayList<BluetoothDevice> mDeviceList;
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothAdapter.LeScanCallback mCallBack;
+    private ArrayList<String> mActiveDeviceNames;
+    private ArrayList<String> mActiveDeviceSignals;
+    private Connection mConnection;
+    private ArrayList<String> mResults;
     private static final int REQUEST_PERMISSION_MODERN = 1;
     private static final int REQUEST_PERMISSION_CLASSIC = 2;
-    private BluetoothAdapter.LeScanCallback callBack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_explore);
-        callBack= (bluetoothDevice, i, bytes) -> {
+        mCallBack= (bluetoothDevice, i, bytes) -> {
             if(!mDeviceList.contains(bluetoothDevice)) {
                 mDeviceList.add(bluetoothDevice);
                 updateDisplay();
@@ -39,6 +57,20 @@ public class AreaExplore extends AppCompatActivity {
         contentDisplay = findViewById(R.id.DeviceList);
         mDeviceList = new ArrayList<>();
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mActiveDeviceNames=new ArrayList<>();
+        mActiveDeviceSignals=new ArrayList<>();
+        mResults=new ArrayList<>();
+        mConnection=generateConnection();
+        if(mConnection!=null)
+        {
+            databaseHandler handle=new databaseHandler();
+            handle.execute("");
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),"Could not connect to database!",Toast.LENGTH_SHORT).show();
+            finish();
+        }
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not supported on this device!", Toast.LENGTH_SHORT).show();
             finish();
@@ -63,7 +95,7 @@ public class AreaExplore extends AppCompatActivity {
                             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_MODERN);
                             }
-                            mBluetoothAdapter.startLeScan(callBack);
+                            mBluetoothAdapter.startLeScan(mCallBack);
                         }
                         else {
                             Toast.makeText(getApplicationContext(), "Bluetooth is needed to detect devices!", Toast.LENGTH_SHORT).show();
@@ -98,19 +130,19 @@ public class AreaExplore extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_MODERN);
             }
-            mBluetoothAdapter.startLeScan(callBack);
+            mBluetoothAdapter.startLeScan(mCallBack);
         }
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_CONNECT},REQUEST_PERMISSION_MODERN);
-            }
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.BLUETOOTH_SCAN},REQUEST_PERMISSION_MODERN);
-            }
-            mBluetoothAdapter.stopLeScan(callBack);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_PERMISSION_MODERN);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_PERMISSION_MODERN);
+        }
+        mBluetoothAdapter.stopLeScan(mCallBack);
     }
 
     private void updateDisplay() {
@@ -123,4 +155,77 @@ public class AreaExplore extends AppCompatActivity {
         }
         contentDisplay.setText(toSet.toString());
     }
+
+
+    private Connection generateConnection()
+    {
+        StrictMode.ThreadPolicy policy=new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        Connection connection=null;
+        try
+        {
+            String connectionUrl="jdbc:mysql://bledata.mysql.database.azure.com:3306/bledata?useSSL=true";//uses jdbc to get connection
+            String json;//reads password from pass.json
+            try {
+                InputStream is = getAssets().open("pass.json");
+                int size = is.available();
+                byte[] buffer = new byte[size];
+                is.read(buffer);
+                is.close();
+                json = new String(buffer, StandardCharsets.UTF_8);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return null;
+            }
+            String password;
+            try {
+                JSONObject obj = new JSONObject(json);
+                password=obj.getString("pass");
+            }
+            catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+            Class.forName("net.sourceforge.jtds.jdbc.Driver");
+            connection= DriverManager.getConnection(connectionUrl,"DanielBulman",password);//forms connection and returns it
+        }
+        catch(ClassNotFoundException e)
+        {
+            Log.e("Class Exception: ",e.getMessage());
+        }
+        catch(SQLException e)
+        {
+            Log.e("SQL Exception",e.getMessage());
+        }
+        return connection;
+    }
+
+    public class databaseHandler extends AsyncTask<String,String, ArrayList<String>> {
+        @Override
+        protected ArrayList<String> doInBackground(String... strings) {
+            try {
+                String query = "select * from bledevices";
+                Statement stat = mConnection.createStatement();
+                ResultSet results = stat.executeQuery(query);
+                while (results.next()) {
+                    mResults.add(results.getString("BleDeviceName") + "///" + results.getString("BleDeviceTransmitSignal"));
+                }
+                mConnection.close();
+            }catch(SQLException e)
+            {
+                Log.e("Sql Error",e.getMessage());
+            }
+            return mResults;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> strings) {
+            for(String result : mResults)
+            {
+                mActiveDeviceNames.add(result.split("///")[0]);
+                mActiveDeviceSignals.add(result.split("///")[1]);
+            }
+        }
+    }
+
 }
