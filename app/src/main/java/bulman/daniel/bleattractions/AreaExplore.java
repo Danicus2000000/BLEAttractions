@@ -83,7 +83,7 @@ public class AreaExplore extends AppCompatActivity {
         if(mConnection!=null)
         {
             databaseHandler handle=new databaseHandler();
-            handle.execute("");
+            handle.execute();
         }
         else
         {
@@ -224,9 +224,9 @@ public class AreaExplore extends AppCompatActivity {
         return connection;
     }
 
-    public class databaseHandler extends AsyncTask<String,String, ArrayList<String>> {
+    public class databaseHandler extends AsyncTask<Void,Void, ArrayList<String>> {
         @Override
-        protected ArrayList<String> doInBackground(String... strings) {
+        protected ArrayList<String> doInBackground(Void... voids) {
             try {
                 String query = "select * from bledevices";
                 Statement stat = mConnection.createStatement();
