@@ -9,6 +9,9 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -31,32 +34,48 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AreaExplore extends AppCompatActivity {
 
     private TextView contentDisplay;
     private ArrayList<BluetoothDevice> mDeviceList;
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothAdapter.LeScanCallback mCallBack;
     private ArrayList<String> mActiveDeviceNames;
     private ArrayList<String> mActiveDeviceSignals;
     private Connection mConnection;
     private ArrayList<String> mResults;
+    private BluetoothLeScanner mScanner;
+    private ScanCallback mScanCallback;
     private static final int REQUEST_PERMISSION_MODERN = 1;
     private static final int REQUEST_PERMISSION_CLASSIC = 2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_explore);
-        mCallBack= (bluetoothDevice, i, bytes) -> {
-            if(!mDeviceList.contains(bluetoothDevice)) {
-                mDeviceList.add(bluetoothDevice);
-                updateDisplay();
+        mScanCallback=new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                super.onScanResult(callbackType, result);
+                if(!mDeviceList.contains(result.getDevice())) {
+                    mDeviceList.add(result.getDevice());
+                    updateDisplay();
+                }
+            }
+
+            @Override
+            public void onBatchScanResults(List<ScanResult> results) {
+                super.onBatchScanResults(results);
+            }
+
+            @Override
+            public void onScanFailed(int errorCode) {
+                super.onScanFailed(errorCode);
             }
         };
         contentDisplay = findViewById(R.id.DeviceList);
         mDeviceList = new ArrayList<>();
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mScanner= mBluetoothAdapter.getBluetoothLeScanner();
         mActiveDeviceNames=new ArrayList<>();
         mActiveDeviceSignals=new ArrayList<>();
         mResults=new ArrayList<>();
@@ -74,10 +93,16 @@ public class AreaExplore extends AppCompatActivity {
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not supported on this device!", Toast.LENGTH_SHORT).show();
             finish();
-        } else if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+        }
+        if (mScanner == null) {
+            Toast.makeText(this, "Bluetooth LE Scanning is not supported on this device!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
             Toast.makeText(this, "Bluetooth is not supported on this device!", Toast.LENGTH_SHORT).show();
             finish();
-        } else if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+        }
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "Bluetooth low energy is not supported on this device!", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -95,7 +120,7 @@ public class AreaExplore extends AppCompatActivity {
                             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_MODERN);
                             }
-                            mBluetoothAdapter.startLeScan(mCallBack);
+                            mScanner.startScan(mScanCallback);
                         }
                         else {
                             Toast.makeText(getApplicationContext(), "Bluetooth is needed to detect devices!", Toast.LENGTH_SHORT).show();
@@ -130,7 +155,7 @@ public class AreaExplore extends AppCompatActivity {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_MODERN);
             }
-            mBluetoothAdapter.startLeScan(mCallBack);
+            mScanner.startScan(mScanCallback);
         }
     }
     @Override
@@ -142,7 +167,7 @@ public class AreaExplore extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_PERMISSION_MODERN);
         }
-        mBluetoothAdapter.stopLeScan(mCallBack);
+        mScanner.stopScan(mScanCallback);
     }
 
     private void updateDisplay() {
@@ -186,16 +211,15 @@ public class AreaExplore extends AppCompatActivity {
                 e.printStackTrace();
                 return null;
             }
-            Class.forName("net.sourceforge.jtds.jdbc.Driver");
             connection= DriverManager.getConnection(connectionUrl,"DanielBulman",password);//forms connection and returns it
-        }
-        catch(ClassNotFoundException e)
-        {
-            Log.e("Class Exception: ",e.getMessage());
         }
         catch(SQLException e)
         {
             Log.e("SQL Exception",e.getMessage());
+        }
+        catch(Exception e)
+        {
+            Log.e("Exception",e.getMessage());
         }
         return connection;
     }
