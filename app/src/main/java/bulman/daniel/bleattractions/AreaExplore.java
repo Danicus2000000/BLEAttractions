@@ -160,8 +160,9 @@ public class AreaExplore extends AppCompatActivity {
         }
         @Override
         protected ArrayList<String> doInBackground(Void... voids) {//in the background connects to the database using connection string
-            String connectionUrl="jdbc:mysql://bledata.mysql.database.azure.com:3306/bledata?useSSL=true";//uses jdbc to get connection
+            String connectionUrl="jdbc:mysql://bledata.mysql.database.azure.com:3306/bledata?useSSL=true?serverTimezone=UTC";//uses jdbc to get connection
             String password="";
+            String username="";
             ArrayList<String> results=new ArrayList<>();
             try
             {
@@ -179,6 +180,7 @@ public class AreaExplore extends AppCompatActivity {
                 }
                 try {
                     JSONObject obj = new JSONObject(json);
+                    username=obj.getString("username");
                     password=obj.getString("pass");
                 }
                 catch (JSONException e) {
@@ -190,7 +192,7 @@ public class AreaExplore extends AppCompatActivity {
             {
                 Log.e("Exception",e.getMessage());
             }
-            try (Connection connection= DriverManager.getConnection(connectionUrl,"DanielBulman",password))//attempts to form connection and perform request
+            try (Connection connection= DriverManager.getConnection(connectionUrl,username,password))//attempts to form connection and perform request
             {
                 if (connection != null) {
                     try {
