@@ -13,8 +13,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -160,60 +163,67 @@ public class AreaExplore extends AppCompatActivity {
         }
         @Override
         protected ArrayList<String> doInBackground(Void... voids) {//in the background connects to the database using connection string
-            String connectionUrl="jdbc:mysql://bledata.mysql.database.azure.com:3306/bledata?useSSL=true?serverTimezone=UTC";//uses jdbc to get connection
-            String password="";
-            String username="";
-            ArrayList<String> results=new ArrayList<>();
-            try
+            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.DISCONNECTED && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.DISCONNECTED)
             {
-                String json;//reads password from pass.json
-                try {
-                    InputStream is = getAssets().open("pass.json");//reads from the password file to get password for database (only stored locally)
-                    int size = is.available();
-                    byte[] buffer = new byte[size];
-                    is.read(buffer);
-                    is.close();
-                    json = new String(buffer, StandardCharsets.UTF_8);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    return null;
-                }
-                try {
-                    JSONObject obj = new JSONObject(json);
-                    username=obj.getString("username");
-                    password=obj.getString("pass");
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(),"Internet Access is needed to connect to database!",Toast.LENGTH_SHORT).show();
+                    finish();
+                });
             }
-            catch(Exception e)
-            {
-                Log.e("Exception",e.getMessage());
-            }
-            try (Connection connection= DriverManager.getConnection(connectionUrl,username,password))//attempts to form connection and perform request
-            {
-                if (connection != null) {
+            else {
+                String connectionUrl = "jdbc:mysql://bledata.mysql.database.azure.com:3306/bledata";//uses jdbc to get connection
+                String password = "";
+                String username = "";
+                ArrayList<String> results = new ArrayList<>();
+                try {
+                    String json;//reads password from pass.json
                     try {
-                        Statement stat = connection.createStatement();
-                        ResultSet resultSet = stat.executeQuery(mQuery);
-                        while (resultSet.next()) {
-                            results.add(resultSet.getString("BleDeviceName") + "///" + resultSet.getString("BleDeviceTransmitSignal"));
-                        }
-                        connection.close();
-                    } catch (SQLException e) {
-                        Log.e("Sql Error", e.getMessage());
+                        InputStream is = getAssets().open("pass.json");//reads from the password file to get password for database (only stored locally)
+                        int size = is.available();
+                        byte[] buffer = new byte[size];
+                        is.read(buffer);
+                        is.close();
+                        json = new String(buffer, StandardCharsets.UTF_8);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        return null;
                     }
-                } else {
+                    try {
+                        JSONObject obj = new JSONObject(json);
+                        username = obj.getString("username");
+                        password = obj.getString("pass");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                } catch (Exception e) {
+                    Log.e("Exception", e.getMessage());
+                }
+                try (Connection connection = DriverManager.getConnection(connectionUrl, username, password))//attempts to form connection and perform request
+                {
+                    if (connection != null) {
+                        try {
+                            Statement stat = connection.createStatement();
+                            ResultSet resultSet = stat.executeQuery(mQuery);
+                            while (resultSet.next()) {
+                                results.add(resultSet.getString("BleDeviceName") + "///" + resultSet.getString("BleDeviceTransmitSignal"));
+                            }
+                            connection.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "A connection to the database could not be made!", Toast.LENGTH_SHORT).show());
+                    }
+                }//forms connection and returns it
+                catch (Exception e) {
+                    e.printStackTrace();
                     runOnUiThread(() -> Toast.makeText(getApplicationContext(), "A connection to the database could not be made!", Toast.LENGTH_SHORT).show());
                 }
-            }//forms connection and returns it
-            catch (Exception e){
-                Log.e("Exception Occurred: ",e.getMessage());
-                runOnUiThread(() -> Toast.makeText(getApplicationContext(),"A connection to the database could not be made!",Toast.LENGTH_SHORT).show());
+                return results;//returns results to async event on complete
             }
-            return results;//returns results to async event on complete
+            return new ArrayList<>();//returns empty array if internet access is not present
         }
 
         @Override
