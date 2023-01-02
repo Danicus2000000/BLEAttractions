@@ -51,10 +51,8 @@
         android:layout_width="297dp"
         android:layout_height="127dp"
         android:layout_marginStart="141dp"
-        android:layout_marginLeft="141dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="142dp"
-        android:layout_marginRight="142dp"
         android:layout_marginBottom="125dp"
         android:contentDescription="@string/logoDescription"
         android:scaleType="fitXY"
@@ -63,6 +61,6 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:src="@drawable/company_logo_default"
+        app:srcCompat="@drawable/company_logo_default"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

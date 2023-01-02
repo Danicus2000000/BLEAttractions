@@ -21,6 +21,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,14 +38,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 //Note pass.json file should be placed at \app\src\main\assets
 public class AreaExplore extends AppCompatActivity {
 
     private TextView contentDisplay;//contains the text display that all found devices are written to
     private ArrayList<BluetoothDevice> mDeviceList;//the list of all devices discovered during bluetooth search
-    private ArrayList<String> mActiveDeviceNames;//the name of Active devices pulled from the database
-    private ArrayList<String> mActiveDeviceSignals;//the signals that need to be matched from these devices
+    private Map<String,String> mDeviceCodesToSearch;
     private BluetoothLeScanner mScanner;//the bluetooth low energy scanner that is in use
     private ScanCallback mScanCallback;//the callback that handles device discovery
     private static final int REQUEST_DEFAULT_CODE = 1;//the request code used to handle simple permission requests
@@ -84,9 +87,8 @@ public class AreaExplore extends AppCompatActivity {
         mDeviceList = new ArrayList<>();
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mScanner= bluetoothAdapter.getBluetoothLeScanner();
-        mActiveDeviceNames=new ArrayList<>();
-        mActiveDeviceSignals=new ArrayList<>();
-        databaseHandler handle=new databaseHandler("select * from bledevices");//starts a threaded task to fetch database data
+        mDeviceCodesToSearch=new HashMap<>();
+        databaseHandler handle=new databaseHandler("select BleDeviceTransmitSignal,BleDeviceUrlToPointTo from bledevices");//starts a threaded task to fetch database data
         handle.execute();
         if (mScanner == null || !getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH) || !getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {//if the bluetooth scanner is out of action error code
             Toast.makeText(this, "A required bluetooth feature is not enabled on this device!", Toast.LENGTH_SHORT).show();
@@ -155,19 +157,19 @@ public class AreaExplore extends AppCompatActivity {
         contentDisplay.setText(toSet.toString());
     }
     @SuppressLint("StaticFieldLeak")
-    public class databaseHandler extends AsyncTask<Void,Void, ArrayList<String>> {//takes in database query and forms connection
+    public class databaseHandler extends AsyncTask<Void,Void, Map<String,String>> {//takes in database query and forms connection
         private final String mQuery;
         public databaseHandler(String pQuery)
         {
             mQuery=pQuery;
         }
         @Override
-        protected ArrayList<String> doInBackground(Void... voids) {//in the background connects to the database using connection string
+        protected Map<String,String> doInBackground(Void... voids) {//in the background connects to the database using connection string
             ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
             if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.DISCONNECTED && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.DISCONNECTED)
             {
                 runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(),"Internet Access is needed to connect to database!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Internet Access is needed to connect to database\nPlease turn on your data or WIFI!",Toast.LENGTH_SHORT).show();
                     finish();
                 });
             }
@@ -175,7 +177,7 @@ public class AreaExplore extends AppCompatActivity {
                 String connectionUrl = "jdbc:mysql://bledata.mysql.database.azure.com:3306/bledata";//uses jdbc to get connection
                 String password = "";
                 String username = "";
-                ArrayList<String> results = new ArrayList<>();
+                Map<String,String> results=new HashMap<>();
                 try {
                     String json;//reads password from pass.json
                     try {
@@ -207,7 +209,7 @@ public class AreaExplore extends AppCompatActivity {
                             Statement stat = connection.createStatement();
                             ResultSet resultSet = stat.executeQuery(mQuery);
                             while (resultSet.next()) {
-                                results.add(resultSet.getString("BleDeviceName") + "///" + resultSet.getString("BleDeviceTransmitSignal"));
+                                results.put(resultSet.getString("BleDeviceTransmitSignal"),resultSet.getString("BleDeviceUrlToPointTo"));
                             }
                             connection.close();
                         } catch (SQLException e) {
@@ -223,18 +225,12 @@ public class AreaExplore extends AppCompatActivity {
                 }
                 return results;//returns results to async event on complete
             }
-            return new ArrayList<>();//returns empty array if internet access is not present
+            return new HashMap<>();//returns empty array if internet access is not present
         }
 
         @Override
-        protected void onPostExecute(ArrayList<String> results) {//once executed the data from the results is passed into the main program
-            if(!results.isEmpty()) {
-                for (String result : results) {
-                    mActiveDeviceNames.add(result.split("///")[0]);
-                    mActiveDeviceSignals.add(result.split("///")[1]);
-                }
-            }
+        protected void onPostExecute(Map<String,String> results) {//once executed the data from the results is passed into the main program
+            mDeviceCodesToSearch.putAll(results);
         }
     }
-
 }
