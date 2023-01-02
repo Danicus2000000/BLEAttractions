@@ -5,4 +5,6 @@
     <string name="queueButtonDefault">Vérifier les temps d\'attente</string>
     <string name="ticketButtonDefault">Obtenir/Vérifier les billets</string>
     <string name="exploreButtonDefault">Explorer la zone</string>
+    <string name="enableOfflineMode">Activer le mode hors ligne</string>
+    <string name="disableOfflineMode">Désactiver le mode hors connexion</string>
 </resources>

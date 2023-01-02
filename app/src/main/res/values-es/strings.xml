@@ -5,4 +5,6 @@
     <string name="ticketButtonDefault">Obtener/Consultar Boletos</string>
     <string name="queueButtonDefault">Verifique los tiempos de cola</string>
     <string name="logoDescription">Logotipo de una empresa</string>
+    <string name="enableOfflineMode">Habilitar el modo fuera de línea</string>
+    <string name="disableOfflineMode">" Deshabilitar el modo fuera de línea"</string>
 </resources>

@@ -5,4 +5,6 @@
     <string name="ticketButtonDefault">Tickets kaufen/checken</string>
     <string name="queueButtonDefault">Überprüfen Sie die Warteschlangenzeiten</string>
     <string name="logoDescription">Ein Firmenlogo</string>
+    <string name="enableOfflineMode">Offline-Modus aktivieren</string>
+    <string name="disableOfflineMode">" Deaktivieren Sie den Offline-Modus"</string>
 </resources>

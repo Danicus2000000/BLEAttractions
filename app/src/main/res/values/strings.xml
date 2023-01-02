@@ -5,4 +5,6 @@
     <string name="ticketButtonDefault">Get/Check Tickets</string>
     <string name="queueButtonDefault">Check Queue Times</string>
     <string name="logoDescription">A Company Logo</string>
+    <string name="enableOfflineMode">Enable offline mode</string>
+    <string name="disableOfflineMode">Disable offline mode</string>
 </resources>

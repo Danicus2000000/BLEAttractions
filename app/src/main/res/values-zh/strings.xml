@@ -5,4 +5,6 @@
     <string name="ticketButtonDefault">获取/检查门票</string>
     <string name="queueButtonDefault">检查排队时间</string>
     <string name="logoDescription">公司标志</string>
+    <string name="enableOfflineMode">启用离线模式</string>
+    <string name="disableOfflineMode">禁用离线模式</string>
 </resources>

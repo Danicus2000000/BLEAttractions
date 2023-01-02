@@ -7,45 +7,73 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/exploreArea"
-        android:layout_width="209dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="31dp"
-        android:layout_marginBottom="18dp"
-        android:text="@string/exploreButtonDefault"
-        app:layout_constraintBottom_toTopOf="@+id/ticketManager"
-        app:layout_constraintEnd_toStartOf="@+id/queueManager" />
-
-    <Button
         android:id="@+id/ticketManager"
         android:layout_width="209dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="261dp"
-        android:layout_marginBottom="26dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="55dp"
+        android:layout_marginEnd="167dp"
         android:text="@string/ticketButtonDefault"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/exploreArea"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+    <Button
+        android:id="@+id/exploreArea"
+        android:layout_width="209dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="132dp"
+        android:layout_marginTop="55dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/exploreButtonDefault"
+        app:layout_constraintBottom_toTopOf="@+id/queueManager"
+        app:layout_constraintEnd_toStartOf="@+id/ticketManager"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+    <Button
+        android:id="@+id/offlineMode"
+        android:layout_width="209dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="167dp"
+        android:layout_marginBottom="90dp"
+        android:text="@string/enableOfflineMode"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/queueManager"
+        app:layout_constraintTop_toBottomOf="@+id/ticketManager" />
 
     <Button
         android:id="@+id/queueManager"
         android:layout_width="209dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="156dp"
-        android:layout_marginBottom="18dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="132dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="90dp"
         android:text="@string/queueButtonDefault"
-        app:layout_constraintBottom_toTopOf="@+id/ticketManager"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/offlineMode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exploreArea" />
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="347dp"
         android:layout_height="93dp"
-        android:layout_marginStart="155dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginStart="183dp"
+        android:layout_marginTop="115dp"
+        android:layout_marginEnd="201dp"
+        android:layout_marginBottom="5dp"
         android:contentDescription="@string/logoDescription"
         android:scaleType="fitXY"
         android:src="@drawable/company_logo_default"
-        app:layout_constraintBottom_toTopOf="@+id/exploreArea"
+        app:layout_constraintBottom_toTopOf="@+id/ticketManager"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/company_logo_default" />
 </androidx.constraintlayout.widget.ConstraintLayout>

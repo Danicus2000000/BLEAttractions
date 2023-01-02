@@ -5,4 +5,6 @@
     <string name="ticketButtonDefault">Λήψη/Έλεγχος εισιτηρίων</string>
     <string name="queueButtonDefault">Ελέγξτε τους χρόνους ουράς</string>
     <string name="logoDescription">Λογότυπο εταιρείας</string>
+    <string name="enableOfflineMode">" Ενεργοποίηση λειτουργίας εκτός σύνδεσης"</string>
+    <string name="disableOfflineMode">Απενεργοποιήστε τη λειτουργία εκτός σύνδεσης</string>
 </resources>

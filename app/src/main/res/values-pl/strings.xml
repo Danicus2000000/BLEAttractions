@@ -5,4 +5,6 @@
     <string name="ticketButtonDefault">Zdobądź / sprawdź bilety</string>
     <string name="queueButtonDefault">Sprawdź czasy kolejek</string>
     <string name="logoDescription">Logo firmy</string>
+    <string name="enableOfflineMode">Włącz tryb offline</string>
+    <string name="disableOfflineMode">Wyłącz tryb offline</string>
 </resources>
