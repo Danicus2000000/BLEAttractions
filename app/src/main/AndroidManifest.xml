@@ -38,6 +38,9 @@
         android:theme="@style/Theme.BLEAttractions"
         tools:targetApi="31">
         <activity
+            android:name=".webViewer"
+            android:exported="false" />
+        <activity
             android:name=".OfflineExplore"
             android:exported="false" />
         <activity

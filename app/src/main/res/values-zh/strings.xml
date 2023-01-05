@@ -7,4 +7,7 @@
     <string name="logoDescription">公司标志</string>
     <string name="enableOfflineMode">启用离线模式</string>
     <string name="disableOfflineMode">禁用离线模式</string>
+    <string name="selectOrganisation_lbl">请选择一个组织以查看其可探索选项！</string>
+    <string name="selectAttraction">" 选择一个景点以查看其信息。"</string>
+    <string name="loadPage_btn">加载页面</string>
 </resources>

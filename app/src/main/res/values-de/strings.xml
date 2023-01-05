@@ -7,4 +7,7 @@
     <string name="logoDescription">Ein Firmenlogo</string>
     <string name="enableOfflineMode">Offline-Modus aktivieren</string>
     <string name="disableOfflineMode">" Deaktivieren Sie den Offline-Modus"</string>
+    <string name="selectOrganisation_lbl">Bitte wählen Sie eine Organisation aus, um ihre erkundbaren Optionen anzuzeigen!</string>
+    <string name="selectAttraction">Wählen Sie eine Attraktion aus, um ihre Informationen anzuzeigen.</string>
+    <string name="loadPage_btn">Seite laden</string>
 </resources>

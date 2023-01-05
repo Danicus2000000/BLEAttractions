@@ -7,4 +7,7 @@
     <string name="logoDescription">Λογότυπο εταιρείας</string>
     <string name="enableOfflineMode">" Ενεργοποίηση λειτουργίας εκτός σύνδεσης"</string>
     <string name="disableOfflineMode">Απενεργοποιήστε τη λειτουργία εκτός σύνδεσης</string>
+    <string name="selectOrganisation_lbl">Επιλέξτε έναν οργανισμό για να δείτε τις Εξερευνήσιμες επιλογές του!</string>
+    <string name="selectAttraction">Επιλέξτε ένα αξιοθέατο για να δείτε τις πληροφορίες του.</string>
+    <string name="loadPage_btn">Φόρτωση σελίδας</string>
 </resources>

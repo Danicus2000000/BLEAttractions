@@ -7,4 +7,7 @@
     <string name="logoDescription">Logo firmy</string>
     <string name="enableOfflineMode">Włącz tryb offline</string>
     <string name="disableOfflineMode">Wyłącz tryb offline</string>
+    <string name="selectOrganisation_lbl">Wybierz organizację, aby wyświetlić dostępne opcje eksploracji!</string>
+    <string name="selectAttraction">" Wybierz atrakcję, aby wyświetlić jej informacje."</string>
+    <string name="loadPage_btn">Załaduj stronę</string>
 </resources>

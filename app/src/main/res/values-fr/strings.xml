@@ -7,4 +7,7 @@
     <string name="exploreButtonDefault">Explorer la zone</string>
     <string name="enableOfflineMode">Activer le mode hors ligne</string>
     <string name="disableOfflineMode">Désactiver le mode hors connexion</string>
+    <string name="selectOrganisation_lbl">Veuillez sélectionner une organisation pour voir ses options explorables!</string>
+    <string name="selectAttraction">Sélectionnez une attraction pour afficher ses informations.</string>
+    <string name="loadPage_btn">Charger la page</string>
 </resources>

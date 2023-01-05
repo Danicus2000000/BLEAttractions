@@ -7,4 +7,7 @@
     <string name="logoDescription">Logotipo de una empresa</string>
     <string name="enableOfflineMode">Habilitar el modo fuera de línea</string>
     <string name="disableOfflineMode">" Deshabilitar el modo fuera de línea"</string>
+    <string name="selectOrganisation_lbl">" ¡Seleccione una organización para ver sus opciones explorables!"</string>
+    <string name="selectAttraction">Seleccione una atracción para ver su información.</string>
+    <string name="loadPage_btn">Cargar página</string>
 </resources>
