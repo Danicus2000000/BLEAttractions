@@ -13,13 +13,18 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class OfflineExplore extends AppCompatActivity {
 
+    private ArrayList<String> organisationsToSelectFrom;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_explore);
+        organisationsToSelectFrom=connectToJSON("organisations","OrganisationName");
+    }
+    private ArrayList<String> connectToJSON(String arrayToSearch, String rowToGet){
         //read local json file for database and attempt to get websites that can be loaded
         try {
             String json="";//reads password from pass.json
@@ -35,13 +40,18 @@ public class OfflineExplore extends AppCompatActivity {
             }
             try {
                 JSONObject obj = new JSONObject(json);
-                JSONArray devices =obj.getJSONArray("bledevices");
-                JSONArray organisations= obj.getJSONArray("organisations");
+                JSONArray arrayToGet =obj.getJSONArray(arrayToSearch);
+                ArrayList<String> result=new ArrayList<>();
+                for(int i=0;i<arrayToGet.length();i++){
+                    result.add(arrayToGet.getJSONObject(i).getString(rowToGet));
+                }
+                return result;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         } catch (Exception e) {
             Log.e("Exception", e.getMessage());
         }
+        return new ArrayList<>();
     }
 }
