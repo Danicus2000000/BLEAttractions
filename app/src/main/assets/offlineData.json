@@ -1,0 +1,39 @@
+{
+  "bledevices": [
+    {
+      "idBleDevice": 1,
+      "BleDeviceName": "testDevice1",
+      "BleDeviceOrganisation": "Ducky's Kingdom",
+      "BleDeviceUrlToPointTo": "https://danicus2000000.github.io/BLEPages/testPage1",
+      "BleDeviceTransmitSignal": "testSignal1"
+    },
+    {
+      "idBleDevice": 2,
+      "BleDeviceName": "testDevice2",
+      "BleDeviceOrganisation": "An Actual Company",
+      "BleDeviceUrlToPointTo": "https://danicus2000000.github.io/BLEPages/testPage2",
+      "BleDeviceTransmitSignal": "testSignal2"
+    },
+    {
+      "idBleDevice": 3,
+      "BleDeviceName": "testDevice3",
+      "BleDeviceOrganisation": "An Actual Company",
+      "BleDeviceUrlToPointTo": "https://danicus2000000.github.io/BLEPages/testPage3",
+      "BleDeviceTransmitSignal": "testSignal3"
+    }
+  ],
+  "organisations": [
+    {
+      "idOrganisation": 1,
+      "OrganisationName": "Ducky's Kingdom",
+      "OrganisationLogoUrl": "https://danicus2000000.github.io/BLEPages/company1Logo.jpg",
+      "OrganisationColourScheme": "Default"
+    },
+    {
+      "idOrganisation": 2,
+      "OrganisationName": "An Actual Company",
+      "OrganisationLogoUrl": "https://danicus2000000.github.io/BLEPages/company2Logo.jpg",
+      "OrganisationColourScheme": "Red"
+    }
+  ]
+}
