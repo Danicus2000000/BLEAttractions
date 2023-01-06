@@ -29,13 +29,11 @@ public class webViewer extends AppCompatActivity {
             progressDialog.setCancelable(false);
             WebView webBrowser = findViewById(R.id.webWindow);
             webBrowser.requestFocus();
-            webBrowser.getSettings().setLightTouchEnabled(true);
             webBrowser.getSettings().setJavaScriptEnabled(true);
             webBrowser.getSettings().setGeolocationEnabled(true);
             webBrowser.setSoundEffectsEnabled(true);
             webBrowser.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
             webBrowser.getSettings().setUseWideViewPort(true);
-            webBrowser.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
             webBrowser.setWebChromeClient(new WebChromeClient(){
                 public void onProgressChanged(WebView view, int progress) {
                     if (progress < 100) {
