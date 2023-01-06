@@ -61,7 +61,9 @@ public class OfflineExplore extends AppCompatActivity {
                 }
                 loadPage.setOnClickListener(view1 -> {//on selecting a page to view pass through the web page to view it
                     Intent webView=new Intent(getApplicationContext(),webViewer.class);
-                    webView.putExtra("urlToLoad",urlPointer.get(attractionsToSelectFrom.indexOf(attractionList.getSelectedItem().toString())));
+                    String[] addressBySlash=urlPointer.get(attractionsToSelectFrom.indexOf(attractionList.getSelectedItem().toString())).split("/");
+                    webView.putExtra("urlToLoad",addressBySlash[addressBySlash.length-1]+".html");
+                    webView.putExtra("isOffline",true);
                     startActivity(webView);
                 });
             }
