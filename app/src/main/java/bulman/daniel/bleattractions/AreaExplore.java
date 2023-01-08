@@ -49,6 +49,7 @@ public class AreaExplore extends AppCompatActivity {
     private Map<String,String> mDeviceCodesToSearch;
     private BluetoothLeScanner mScanner;//the bluetooth low energy scanner that is in use
     private ScanCallback mScanCallback;//the callback that handles device discovery
+    private static final int REQUEST_ENABLE_SCANNER_CODE=0;
     private static final int REQUEST_DEFAULT_CODE = 1;//the request code used to handle simple permission requests
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,11 +117,13 @@ public class AreaExplore extends AppCompatActivity {
         else//if bluetooth is enabled check we have permissions then launch the scanner
         {
             if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_DEFAULT_CODE);
-            } else{
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_DEFAULT_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ENABLE_SCANNER_CODE);
+            } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT < Build.VERSION_CODES.S){
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ENABLE_SCANNER_CODE);
             }
-            mScanner.startScan(mScanCallback);
+            else {
+                mScanner.startScan(mScanCallback);//start scanning
+            }
         }
     }
     @Override
@@ -129,6 +132,14 @@ public class AreaExplore extends AppCompatActivity {
         if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getApplicationContext(), "Permissions needed to continue!", Toast.LENGTH_SHORT).show();
             finish();
+        }
+        else if(requestCode==REQUEST_ENABLE_SCANNER_CODE){
+            if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ENABLE_SCANNER_CODE);
+            } else{
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ENABLE_SCANNER_CODE);
+            }
+            mScanner.startScan(mScanCallback);//start scanning
         }
     }
     @Override
@@ -214,13 +225,10 @@ public class AreaExplore extends AppCompatActivity {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                    } else {
-                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "A connection to the database could not be made!", Toast.LENGTH_SHORT).show());
                     }
                 }//forms connection and returns it
                 catch (Exception e) {
                     e.printStackTrace();
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "A connection to the database could not be made!", Toast.LENGTH_SHORT).show());
                 }
                 return results;//returns results to async event on complete
             }

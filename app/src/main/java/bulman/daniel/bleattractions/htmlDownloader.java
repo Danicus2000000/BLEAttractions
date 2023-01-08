@@ -1,6 +1,7 @@
 package bulman.daniel.bleattractions;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.AsyncTask;
@@ -17,11 +18,12 @@ import java.net.URL;
         private final String mURL;
         private final String mFileName;
         private final Context mApplicationContext;
-
-        protected htmlDownloader(String pURL, Context pContext) {
+        private final ProgressDialog mDialog;
+        protected htmlDownloader(String pURL, Context pContext, ProgressDialog pDialog) {
             mURL = pURL;
             mApplicationContext = pContext;
             String[] segments = pURL.split("/");
+            mDialog=pDialog;
             if (segments[segments.length - 1].contains(".css")) {
                 mFileName = segments[segments.length - 1];
             } else {
@@ -75,9 +77,12 @@ import java.net.URL;
                 outputStreamWriter.write(contents);
                 outputStreamWriter.flush();
                 outputStreamWriter.close();
-                Toast.makeText(mApplicationContext, "File " + mFileName + " has been written!", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            if(mDialog!=null) {//if there is a progress dialog close it
+                mDialog.dismiss();
+                Toast.makeText(contextWrapper,"Download Complete!",Toast.LENGTH_SHORT).show();
             }
         }
     }

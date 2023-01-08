@@ -4,6 +4,8 @@ package bulman.daniel.bleattractions;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +13,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -29,15 +30,31 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private boolean offlineMode=false;
+    private ProgressDialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button openExploreButton=findViewById(R.id.exploreArea);//open area explore
         openExploreButton.setOnClickListener(view -> {
-            if(!offlineMode) {
+            if(!offlineMode) {//ask user if they want to download new data if no open into explore if yes download then on download complete open explore
+                AlertDialog.Builder build=new AlertDialog.Builder(MainActivity.this);
                 Intent openExploreIntent = new Intent(getApplicationContext(), AreaExplore.class);
-                startActivity(openExploreIntent);
+                build.setMessage("Download new offline data?");
+                build.setTitle("New offline data available!");
+                build.setPositiveButton("Yes", (dialogInterface, i) -> {
+                    dialog=new ProgressDialog(MainActivity.this);
+                    dialog.setCancelable(false);
+                    dialog.setMessage("Downloading...");
+                    dialog.setOnDismissListener(dialogInterface1 -> startActivity(openExploreIntent));
+                    dialog.show();
+                    //download all urls data
+                    databaseHandler handle = new databaseHandler("select BleDeviceUrlToPointTo from bledevices");
+                    handle.execute();
+                });
+                build.setNegativeButton("No", (dialogInterface, i) -> startActivity(openExploreIntent));
+                build.setCancelable(true);
+                build.create().show();
             }
             else{
                 Intent openOfflineExplore=new Intent(getApplicationContext(),OfflineExplore.class);
@@ -78,11 +95,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         checkConnections();//runs checks to determine whether or not the application has access to required network resources
-        if(!offlineMode) {
-            //download all urls data
-            databaseHandler handle = new databaseHandler("select BleDeviceUrlToPointTo from bledevices");
-            handle.execute();
-        }
     }
 
     private void checkConnections(){
@@ -121,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 String username = "";
                 ArrayList<String> results = new ArrayList<>();
                 try {
-                    String json;//reads password from pass.json
+                    String json="";//reads password from pass.json
                     try {
                         InputStream is = getAssets().open("pass.json");//reads from the password file to get password for database (only stored locally)
                         int size = is.available();
@@ -129,9 +141,8 @@ public class MainActivity extends AppCompatActivity {
                         is.read(buffer);
                         is.close();
                         json = new String(buffer, StandardCharsets.UTF_8);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        return null;
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                     try {
                         JSONObject obj = new JSONObject(json);
@@ -139,11 +150,11 @@ public class MainActivity extends AppCompatActivity {
                         password = obj.getString("pass");
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        return null;
                     }
                 } catch (Exception e) {
-                    Log.e("Exception", e.getMessage());
+                    e.printStackTrace();
                 }
+                DriverManager.setLoginTimeout(2);//sets timeout on login request
                 try (Connection connection = DriverManager.getConnection(connectionUrl, username, password))//attempts to form connection and perform request
                 {
                     if (connection != null) {
@@ -159,8 +170,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }//forms connection and returns it
-                catch (Exception e) {
-                    e.printStackTrace();
+                catch (SQLException e) {
+                    dialog.dismiss();
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(),"A connection to the database could not be made!",Toast.LENGTH_SHORT).show());
                 }
                 return results;//returns results to async event on complete
             }
@@ -170,12 +182,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<String> results) {//once executed offline data is updated
             if (results != null) {
-                for (String result : results) {
-                    htmlDownloader downloader = new htmlDownloader(result, getApplicationContext());
+                if(results.size()!=0) {
+                    for (String result : results) {
+                        htmlDownloader downloader = new htmlDownloader(result, getApplicationContext(), null);
+                        downloader.execute();
+                    }
+                    htmlDownloader downloader = new htmlDownloader("https://danicus2000000.github.io/BLEPages/default.css", getApplicationContext(), dialog);
                     downloader.execute();
                 }
-                htmlDownloader downloader = new htmlDownloader("https://danicus2000000.github.io/BLEPages/default.css", getApplicationContext());
-                downloader.execute();
+                else{
+                    dialog.dismiss();
+                }
+            }
+            else{
+                dialog.dismiss();
             }
         }
     }

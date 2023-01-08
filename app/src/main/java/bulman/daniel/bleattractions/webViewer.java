@@ -12,6 +12,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -63,6 +64,7 @@ public class webViewer extends AppCompatActivity {
                     is.read(buffer);
                     is.close();
                     String webInput = new String(buffer, StandardCharsets.UTF_8);
+                    webInput=webInput.replaceAll("default.css","file:///"+getFilesDir().getAbsolutePath()+"/default.css");//load css file
                     webBrowser.loadData(webInput,"text/html; charset=UTF-8", null);
                 } catch (IOException e) {//on error warn user the file was not accessible
                     Toast.makeText(getApplicationContext(),"File "+ intent.getStringExtra("urlToLoad")+" does not exist!",Toast.LENGTH_SHORT).show();
