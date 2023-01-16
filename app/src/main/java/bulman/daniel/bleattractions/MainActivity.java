@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(openTicketManagerIntent);
             }
             else{
-                Toast.makeText(getApplicationContext(),"Ticket Manager is not currently supported whilst in offline mode!",Toast.LENGTH_SHORT).show();
+                Intent openOfflineTicketManager=new Intent(getApplicationContext(),offlineTicketManager.class);
+                startActivity(openOfflineTicketManager);
             }
         });
         Button openQueueExplorer=findViewById(R.id.queueManager);//open queue manager
@@ -78,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(openQueueManagerIntent);
             }
             else{
-                Toast.makeText(getApplicationContext(),"Queue Manager is not currently supported whilst in offline mode!",Toast.LENGTH_SHORT).show();
+                Intent openOfflineQueueManager=new Intent(getApplicationContext(),offlineQueueExplorer.class);
+                startActivity(openOfflineQueueManager);
             }
         });
         Button changeNetworkMode=findViewById(R.id.offlineMode);//enables/disables offline mode

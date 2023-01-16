@@ -10,4 +10,7 @@
     <string name="selectOrganisation_lbl">请选择一个组织以查看其可探索选项！</string>
     <string name="selectAttraction">" 选择一个景点以查看其信息。"</string>
     <string name="loadPage_btn">加载页面</string>
+    <string name="loadingTimes">" 正在加载景点时间…"</string>
+    <string name="nameList">名称:</string>
+    <string name="MACList">MAC地址:</string>
 </resources>

@@ -10,4 +10,7 @@
     <string name="selectOrganisation_lbl">Veuillez sélectionner une organisation pour voir ses options explorables!</string>
     <string name="selectAttraction">Sélectionnez une attraction pour afficher ses informations.</string>
     <string name="loadPage_btn">Charger la page</string>
+    <string name="loadingTimes">Chargement des heures d\'attraction…</string>
+    <string name="nameList">Nom:</string>
+    <string name="MACList">Adresse Mac:</string>
 </resources>

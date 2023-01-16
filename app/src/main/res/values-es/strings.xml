@@ -10,4 +10,7 @@
     <string name="selectOrganisation_lbl">" ¡Seleccione una organización para ver sus opciones explorables!"</string>
     <string name="selectAttraction">Seleccione una atracción para ver su información.</string>
     <string name="loadPage_btn">Cargar página</string>
+    <string name="loadingTimes">Cargando horarios de atracciones…</string>
+    <string name="nameList">" Nombre:"</string>
+    <string name="MACList">" Dirección MAC:"</string>
 </resources>

@@ -38,6 +38,12 @@
         android:theme="@style/Theme.BLEAttractions"
         tools:targetApi="31">
         <activity
+            android:name=".offlineTicketManager"
+            android:exported="false" />
+        <activity
+            android:name=".offlineQueueExplorer"
+            android:exported="false" />
+        <activity
             android:name=".webViewer"
             android:exported="false" />
         <activity

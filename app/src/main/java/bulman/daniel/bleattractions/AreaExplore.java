@@ -162,7 +162,7 @@ public class AreaExplore extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_DEFAULT_CODE);
         }
         for (int i = 0; i < mDeviceList.size(); i++) {//check we have permission and then add name and mac address to list
-            toSet.append("Name: ").append(mDeviceList.get(i).getName()).append(" MAC Address: ").append(mDeviceList.get(i).getAddress()).append("\n");
+            toSet.append(getString(R.string.nameList)).append(" ").append(mDeviceList.get(i).getName()).append(" ").append(getString(R.string.MACList)).append(" ").append(mDeviceList.get(i).getAddress()).append("\n");
         }
         contentDisplay.setText(toSet.toString());
     }

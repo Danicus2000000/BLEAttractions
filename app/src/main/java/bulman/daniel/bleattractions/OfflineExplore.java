@@ -50,7 +50,7 @@ public class OfflineExplore extends AppCompatActivity {
                     JSONArray arrayToGet = jsonOfflineData.getJSONArray("bledevices");
                     for (int j = 0; j < arrayToGet.length(); j++) {
                         if(arrayToGet.getJSONObject(j).getString("BleDeviceOrganisation").equals(organisationList.getSelectedItem().toString())) {
-                            attractionsToSelectFrom.add(arrayToGet.getJSONObject(j).getString("BleDeviceName"));
+                            attractionsToSelectFrom.add(arrayToGet.getJSONObject(j).getString("BleDeviceTitle"));
                             urlPointer.add(arrayToGet.getJSONObject(j).getString("BleDeviceUrlToPointTo"));
                         }
                     }

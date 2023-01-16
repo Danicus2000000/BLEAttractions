@@ -10,4 +10,7 @@
     <string name="selectOrganisation_lbl">Επιλέξτε έναν οργανισμό για να δείτε τις Εξερευνήσιμες επιλογές του!</string>
     <string name="selectAttraction">Επιλέξτε ένα αξιοθέατο για να δείτε τις πληροφορίες του.</string>
     <string name="loadPage_btn">Φόρτωση σελίδας</string>
+    <string name="loadingTimes">" Φόρτωση Attraction Times…"</string>
+    <string name="nameList">Ονομα:</string>
+    <string name="MACList">Διεύθυνση MAC:</string>
 </resources>

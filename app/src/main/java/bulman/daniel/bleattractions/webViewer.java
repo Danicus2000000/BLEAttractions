@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class webViewer extends AppCompatActivity {
-
+    private WebView webBrowser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {//load url if present
         super.onCreate(savedInstanceState);
@@ -28,7 +28,7 @@ public class webViewer extends AppCompatActivity {
             final ProgressDialog progressDialog = new ProgressDialog(this);//web settings to make browser full fat and add progress message for loading
             progressDialog.setMessage("Loading Web Page...");
             progressDialog.setCancelable(false);
-            WebView webBrowser = findViewById(R.id.webWindow);
+            webBrowser = findViewById(R.id.webWindow);
             webBrowser.requestFocus();
             webBrowser.getSettings().setJavaScriptEnabled(true);
             webBrowser.getSettings().setGeolocationEnabled(true);
@@ -55,6 +55,7 @@ public class webViewer extends AppCompatActivity {
                     view.loadUrl(request.getUrl().toString());
                     return super.shouldOverrideUrlLoading(view, request);
                 }
+
             });
             if(intent.getBooleanExtra("isOffline",false)){//attempt load from local file if present
                 try {
@@ -78,6 +79,15 @@ public class webViewer extends AppCompatActivity {
         else{//display error on failed load
             Toast.makeText(getApplicationContext(),"No Url was provided!",Toast.LENGTH_SHORT).show();
             finish();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        if(webBrowser!=null && webBrowser.canGoBack()){
+            webBrowser.goBack();
+        }
+        else {
+            super.onBackPressed();
         }
     }
 }

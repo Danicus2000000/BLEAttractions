@@ -3,6 +3,8 @@
     {
       "idBleDevice": 1,
       "BleDeviceName": "testDevice1",
+      "BleDeviceTitle": "The T-Rex",
+      "BleDeviceQueueTime": "0 Hour(s) 30 Minute(s)",
       "BleDeviceOrganisation": "Ducky's Kingdom",
       "BleDeviceUrlToPointTo": "https://danicus2000000.github.io/BLEPages/testPage1",
       "BleDeviceTransmitSignal": "testSignal1"
@@ -10,6 +12,8 @@
     {
       "idBleDevice": 2,
       "BleDeviceName": "testDevice2",
+      "BleDeviceTitle": "The Dodo",
+      "BleDeviceQueueTime": "0 Hour(s) 5 Minute(s)",
       "BleDeviceOrganisation": "An Actual Company",
       "BleDeviceUrlToPointTo": "https://danicus2000000.github.io/BLEPages/testPage2",
       "BleDeviceTransmitSignal": "testSignal2"
@@ -17,6 +21,8 @@
     {
       "idBleDevice": 3,
       "BleDeviceName": "testDevice3",
+      "BleDeviceTitle": "Fossilization",
+      "BleDeviceQueueTime": "1 Hour(s) 2 Minute(s)",
       "BleDeviceOrganisation": "An Actual Company",
       "BleDeviceUrlToPointTo": "https://danicus2000000.github.io/BLEPages/testPage3",
       "BleDeviceTransmitSignal": "testSignal3"
