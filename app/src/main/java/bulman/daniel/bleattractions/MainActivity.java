@@ -1,6 +1,7 @@
 package bulman.daniel.bleattractions;
 
-
+//TODO: Orientations for pages (in progress)
+//TODO: Offline pages (Fix linking bug)
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
