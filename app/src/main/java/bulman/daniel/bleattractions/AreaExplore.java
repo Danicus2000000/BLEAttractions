@@ -59,7 +59,7 @@ public class AreaExplore extends AppCompatActivity {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {//if result is found and has not already been discovered add to list
                 super.onScanResult(callbackType, result);
-                if(!mDeviceList.contains(result.getDevice())) {
+                if(!mDeviceList.contains(result.getDevice()) && result.getRssi()>=-70) {
                     mDeviceList.add(result.getDevice());
                     updateDisplay();
                 }
@@ -70,7 +70,7 @@ public class AreaExplore extends AppCompatActivity {
                 super.onBatchScanResults(results);
                 for(ScanResult result : results)
                 {
-                    if(!mDeviceList.contains(result.getDevice())) {
+                    if(!mDeviceList.contains(result.getDevice()) && result.getRssi()>=-70) {
                         mDeviceList.add(result.getDevice());
                         updateDisplay();
                     }
@@ -162,7 +162,11 @@ public class AreaExplore extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_DEFAULT_CODE);
         }
         for (int i = 0; i < mDeviceList.size(); i++) {//check we have permission and then add name and mac address to list
-            toSet.append(getString(R.string.nameList)).append(" ").append(mDeviceList.get(i).getName()).append(" ").append(getString(R.string.MACList)).append(" ").append(mDeviceList.get(i).getAddress()).append("\n");
+            if(mDeviceList.get(i).getName()!=null)
+            {
+                toSet.append(getString(R.string.nameList)).append(" ").append(mDeviceList.get(i).getName()).append(" ");
+            }
+            toSet.append(getString(R.string.MACList)).append(" ").append(mDeviceList.get(i).getAddress()).append("\n");
         }
         contentDisplay.setText(toSet.toString());
     }
@@ -237,7 +241,9 @@ public class AreaExplore extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Map<String,String> results) {//once executed the data from the results is passed into the main program
-            mDeviceCodesToSearch.putAll(results);
+            if(results!=null) {
+                mDeviceCodesToSearch.putAll(results);
+            }
         }
     }
 }
