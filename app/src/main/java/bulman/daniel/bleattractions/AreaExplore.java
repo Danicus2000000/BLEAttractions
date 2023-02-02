@@ -36,7 +36,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ import java.util.Map;
 public class AreaExplore extends AppCompatActivity {
 
     private TextView contentDisplay;//contains the text display that all found devices are written to
-    private ArrayList<BluetoothDevice> mDeviceList;//the list of all devices discovered during bluetooth search
+    private Map<BluetoothDevice,Integer> mDeviceList;//the list of all devices discovered during bluetooth search
     private Map<String,String> mDeviceCodesToSearch;
     private BluetoothLeScanner mScanner;//the bluetooth low energy scanner that is in use
     private ScanCallback mScanCallback;//the callback that handles device discovery
@@ -59,8 +58,8 @@ public class AreaExplore extends AppCompatActivity {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {//if result is found and has not already been discovered add to list
                 super.onScanResult(callbackType, result);
-                if(!mDeviceList.contains(result.getDevice()) && result.getRssi()>=-70) {
-                    mDeviceList.add(result.getDevice());
+                if(!mDeviceList.containsKey(result.getDevice()) && result.getRssi()>=-70) {
+                    mDeviceList.put(result.getDevice(),result.getRssi());
                     updateDisplay();
                 }
             }
@@ -70,8 +69,8 @@ public class AreaExplore extends AppCompatActivity {
                 super.onBatchScanResults(results);
                 for(ScanResult result : results)
                 {
-                    if(!mDeviceList.contains(result.getDevice()) && result.getRssi()>=-70) {
-                        mDeviceList.add(result.getDevice());
+                    if(!mDeviceList.containsKey(result.getDevice()) && result.getRssi()>=-70) {
+                        mDeviceList.put(result.getDevice(),result.getRssi());
                         updateDisplay();
                     }
                 }
@@ -84,7 +83,7 @@ public class AreaExplore extends AppCompatActivity {
             }
         };
         contentDisplay = findViewById(R.id.DeviceList);//initialise basic variables
-        mDeviceList = new ArrayList<>();
+        mDeviceList = new HashMap<>();
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mScanner= bluetoothAdapter.getBluetoothLeScanner();
         mDeviceCodesToSearch=new HashMap<>();
@@ -161,12 +160,12 @@ public class AreaExplore extends AppCompatActivity {
         } else{
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_DEFAULT_CODE);
         }
-        for (int i = 0; i < mDeviceList.size(); i++) {//check we have permission and then add name and mac address to list
-            if(mDeviceList.get(i).getName()!=null)
+        for (Map.Entry<BluetoothDevice,Integer> entry : mDeviceList.entrySet()) {//check we have permission and then add name and mac address to list
+            if(entry.getKey().getName()!=null)
             {
-                toSet.append(getString(R.string.nameList)).append(" ").append(mDeviceList.get(i).getName()).append(" ");
+                toSet.append(getString(R.string.nameList)).append(" ").append(entry.getKey().getName()).append(" ");
             }
-            toSet.append(getString(R.string.MACList)).append(" ").append(mDeviceList.get(i).getAddress()).append("\n");
+            toSet.append(getString(R.string.MACList)).append(" ").append(entry.getKey().getAddress()).append(" Signal Noise: ").append(entry.getValue()).append("dBm").append("\n");
         }
         contentDisplay.setText(toSet.toString());
     }

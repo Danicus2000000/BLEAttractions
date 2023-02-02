@@ -4,7 +4,7 @@
 #include "BLEServer.h"
 #include "BLEBeacon.h"
 #include "esp_sleep.h"
-#define GPIO_DEEP_SLEEP_DURATION     10  // sleep x seconds and then wake up
+#define GPIO_DEEP_SLEEP_DURATION     2  // sleep x seconds and then wake up
 RTC_DATA_ATTR static time_t last;        // remember last boot in RTC Memory
 RTC_DATA_ATTR static uint32_t bootcount; // remember number of boots in RTC Memory
 BLEAdvertising *pAdvertising;   // BLE Advertisement type
@@ -35,7 +35,7 @@ void setup() {
   Serial.printf("deep sleep (%lds since last reset, %lds since last boot)\n", now.tv_sec, now.tv_sec - last);
   last = now.tv_sec;
   // Create the BLE Device
-  BLEDevice::init("ESP32 as iBeacon");
+  BLEDevice::init("testDevice1");
   // Create the BLE Server
   BLEServer *pServer = BLEDevice::createServer(); // <-- no longer required to instantiate BLEServer, less flash and ram usage
   pAdvertising = BLEDevice::getAdvertising();
