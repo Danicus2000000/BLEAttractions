@@ -22,6 +22,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 //Note pass.json file should be placed at \app\src\main\assets
+@SuppressLint("MissingPermission")
 public class AreaExplore extends AppCompatActivity {
 
     private TextView contentDisplay;//contains the text display that all found devices are written to
@@ -50,14 +53,36 @@ public class AreaExplore extends AppCompatActivity {
     private ScanCallback mScanCallback;//the callback that handles device discovery
     private static final int REQUEST_ENABLE_SCANNER_CODE=0;
     private static final int REQUEST_DEFAULT_CODE = 1;//the request code used to handle simple permission requests
+    private Button mLoadWeb;
+    private String mWebUrl="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_explore);
+        mLoadWeb=findViewById(R.id.loadWebPage);//when button is clicked load webpage
+        mLoadWeb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent loadWeb=new Intent(getApplicationContext(),webViewer.class);
+                loadWeb.putExtra("urlToLoad",mWebUrl);
+                startActivity(loadWeb);
+                mLoadWeb.setVisibility(View.INVISIBLE);
+            }
+        });
         mScanCallback=new ScanCallback() {//initialise callback
             @Override
             public void onScanResult(int callbackType, ScanResult result) {//if result is found and has not already been discovered add to list
                 super.onScanResult(callbackType, result);
+                if(result.getDevice().getName()!=null) {
+                    for (Map.Entry<String, String> possibleDevice : mDeviceCodesToSearch.entrySet()) {
+                        if (possibleDevice.getKey().equals(result.getDevice().getName())){
+                            mLoadWeb.setText("Attraction "+possibleDevice.getKey());
+                            mWebUrl=possibleDevice.getValue();
+                            mLoadWeb.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+                }
                 if(!mDeviceList.containsKey(result.getDevice()) && result.getRssi()>=-70) {
                     mDeviceList.put(result.getDevice(),result.getRssi());
                     updateDisplay();
@@ -69,6 +94,16 @@ public class AreaExplore extends AppCompatActivity {
                 super.onBatchScanResults(results);
                 for(ScanResult result : results)
                 {
+                    if(result.getDevice().getName()!=null) {
+                        for (Map.Entry<String, String> possibleDevice : mDeviceCodesToSearch.entrySet()) {
+                            if (possibleDevice.getKey().equals(result.getDevice().getName())){
+                                mLoadWeb.setText("Attraction "+possibleDevice.getKey());
+                                mWebUrl=possibleDevice.getValue();
+                                mLoadWeb.setVisibility(View.VISIBLE);
+                                break;
+                            }
+                        }
+                    }
                     if(!mDeviceList.containsKey(result.getDevice()) && result.getRssi()>=-70) {
                         mDeviceList.put(result.getDevice(),result.getRssi());
                         updateDisplay();
@@ -87,7 +122,7 @@ public class AreaExplore extends AppCompatActivity {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mScanner= bluetoothAdapter.getBluetoothLeScanner();
         mDeviceCodesToSearch=new HashMap<>();
-        databaseHandler handle=new databaseHandler("select BleDeviceTransmitSignal,BleDeviceUrlToPointTo from bledevices");//starts a threaded task to fetch database data
+        databaseHandler handle=new databaseHandler("select BleDeviceName,BleDeviceUrlToPointTo from bledevices");//starts a threaded task to fetch database data
         handle.execute();
         if (mScanner == null || !getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH) || !getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {//if the bluetooth scanner is out of action error code
             Toast.makeText(this, "A required bluetooth feature is not enabled on this device!", Toast.LENGTH_SHORT).show();
@@ -222,7 +257,7 @@ public class AreaExplore extends AppCompatActivity {
                             Statement stat = connection.createStatement();
                             ResultSet resultSet = stat.executeQuery(mQuery);
                             while (resultSet.next()) {
-                                results.put(resultSet.getString("BleDeviceTransmitSignal"),resultSet.getString("BleDeviceUrlToPointTo"));
+                                results.put(resultSet.getString("BleDeviceName"),resultSet.getString("BleDeviceUrlToPointTo"));
                             }
                             connection.close();
                         } catch (SQLException e) {
