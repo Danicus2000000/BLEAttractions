@@ -13,6 +13,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -38,6 +39,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,37 +57,57 @@ public class AreaExplore extends AppCompatActivity {
     private static final int REQUEST_ENABLE_SCANNER_CODE=0;
     private static final int REQUEST_DEFAULT_CODE = 1;//the request code used to handle simple permission requests
     private Button mLoadWeb;
+    private Button mLoadWeb2;
+    private Button mLoadWeb3;
     private String mWebUrl="";
+    private String mWebUrl2="";
+    private String mWebUrl3="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_explore);
         mLoadWeb=findViewById(R.id.loadWebPage);//when button is clicked load webpage
-        mLoadWeb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent loadWeb=new Intent(getApplicationContext(),webViewer.class);
-                loadWeb.putExtra("urlToLoad",mWebUrl);
-                startActivity(loadWeb);
-                mLoadWeb.setVisibility(View.INVISIBLE);
-            }
+        mLoadWeb2=findViewById(R.id.loadWebPage2);
+        mLoadWeb3=findViewById(R.id.loadWebPage3);
+        mLoadWeb.setOnClickListener(view -> {
+            Intent loadWeb=new Intent(getApplicationContext(),webViewer.class);
+            loadWeb.putExtra("urlToLoad",mWebUrl);
+            startActivity(loadWeb);
+        });
+        mLoadWeb2.setOnClickListener(view -> {
+            Intent loadWeb=new Intent(getApplicationContext(),webViewer.class);
+            loadWeb.putExtra("urlToLoad",mWebUrl2);
+            startActivity(loadWeb);
+        });
+        mLoadWeb3.setOnClickListener(view -> {
+            Intent loadWeb=new Intent(getApplicationContext(),webViewer.class);
+            loadWeb.putExtra("urlToLoad",mWebUrl3);
+            startActivity(loadWeb);
         });
         mScanCallback=new ScanCallback() {//initialise callback
             @Override
             public void onScanResult(int callbackType, ScanResult result) {//if result is found and has not already been discovered add to list
                 super.onScanResult(callbackType, result);
-                if(result.getDevice().getName()!=null) {
-                    for (Map.Entry<String, String> possibleDevice : mDeviceCodesToSearch.entrySet()) {
-                        if (possibleDevice.getKey().equals(result.getDevice().getName())){
-                            mLoadWeb.setText("Attraction "+possibleDevice.getKey());
-                            mWebUrl=possibleDevice.getValue();
+                for (Map.Entry<String, String> possibleDevice : mDeviceCodesToSearch.entrySet()) {
+                    if (possibleDevice.getKey().equals(result.getDevice().getName())) {
+                        if (mLoadWeb.getText().equals("")) {
+                            mLoadWeb.setText("Attraction " + possibleDevice.getKey());
+                            mWebUrl = possibleDevice.getValue();
                             mLoadWeb.setVisibility(View.VISIBLE);
-                            break;
+                        } else if (!mLoadWeb.getText().equals("Attraction " +possibleDevice.getKey()) && mLoadWeb2.getText().equals("")) {
+                            mLoadWeb2.setText("Attraction " + possibleDevice.getKey());
+                            mWebUrl2 = possibleDevice.getValue();
+                            mLoadWeb2.setVisibility(View.VISIBLE);
+                        } else if (!mLoadWeb2.getText().equals("Attraction " +possibleDevice.getKey()) && !mLoadWeb.getText().equals("Attraction " +possibleDevice.getKey()) && mLoadWeb3.getText().equals("")) {
+                            mLoadWeb3.setText("Attraction " + possibleDevice.getKey());
+                            mWebUrl3 = possibleDevice.getValue();
+                            mLoadWeb3.setVisibility(View.VISIBLE);
                         }
+                        break;
                     }
                 }
-                if(!mDeviceList.containsKey(result.getDevice()) && result.getRssi()>=-70) {
-                    mDeviceList.put(result.getDevice(),result.getRssi());
+                if (!mDeviceList.containsKey(result.getDevice()) && result.getRssi() >= -70) {
+                    mDeviceList.put(result.getDevice(), result.getRssi());
                     updateDisplay();
                 }
             }
@@ -92,15 +115,13 @@ public class AreaExplore extends AppCompatActivity {
             @Override
             public void onBatchScanResults(List<ScanResult> results) {//if multiple results are found check they have not been added and then add them
                 super.onBatchScanResults(results);
+                ArrayList<ScanResult> resultMatch=new ArrayList<>();
                 for(ScanResult result : results)
                 {
                     if(result.getDevice().getName()!=null) {
                         for (Map.Entry<String, String> possibleDevice : mDeviceCodesToSearch.entrySet()) {
                             if (possibleDevice.getKey().equals(result.getDevice().getName())){
-                                mLoadWeb.setText("Attraction "+possibleDevice.getKey());
-                                mWebUrl=possibleDevice.getValue();
-                                mLoadWeb.setVisibility(View.VISIBLE);
-                                break;
+                                resultMatch.add(result);
                             }
                         }
                     }
@@ -108,6 +129,26 @@ public class AreaExplore extends AppCompatActivity {
                         mDeviceList.put(result.getDevice(),result.getRssi());
                         updateDisplay();
                     }
+                }
+                if(resultMatch.size()!=0) {
+                    int closestVal = Integer.MAX_VALUE;
+                    ScanResult closest = null;
+                    Map.Entry<String,String> urlToGet=new AbstractMap.SimpleEntry<>("","");
+                    for (ScanResult result : resultMatch) {
+                        if (result.getRssi() < closestVal) {
+                            closestVal = result.getRssi();
+                            closest = result;
+                        }
+                    }
+                    for (Map.Entry<String, String> possibleDevice : mDeviceCodesToSearch.entrySet()) {
+                        if (closest!=null &&possibleDevice.getKey().equals(closest.getDevice().getName())){
+                            urlToGet=possibleDevice;
+                            break;
+                        }
+                    }
+                    mLoadWeb.setText("Attraction " + urlToGet.getKey());
+                    mWebUrl = urlToGet.getValue();
+                    mLoadWeb.setVisibility(View.VISIBLE);
                 }
             }
 
