@@ -9,8 +9,8 @@ android {
         applicationId "bulman.daniel.bleattractions"
         minSdk 21
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        versionCode 0
+        versionName "0.35Alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
