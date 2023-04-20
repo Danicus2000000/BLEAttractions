@@ -23,7 +23,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,13 +94,19 @@ public class QueueExplorer extends AppCompatActivity {
                             connection.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                            Toast.makeText(getApplicationContext(),"Could not connect to database!",Toast.LENGTH_SHORT).show();
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(),"Could not connect to database!",Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
                         }
                     }
                 }//forms connection and returns it
                 catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getApplicationContext(),"Could not connect to database!",Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(),"Could not connect to database!",Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
                 }
                 return results;//returns results to async event on complete
             }
